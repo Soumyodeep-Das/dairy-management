@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Your Cart - Dairy Fresh</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh</div>
+  <h1>Your Cart</h1>
+  <div id="cart-container"></div>
+  <button id="checkout-btn" class="btn" style="display: none;">Proceed to Checkout</button>
+  <script type="module">
+    import { qs, ce, formatPrice } from "../js/utils.js";
+    import { getUserSession } from "../js/auth.js";
+    async function fetchCart() {
+      const user = getUserSession();
+      if (!user) {
+        alert("Please login first.");
+        window.location.href = "../login.html";
+        return;
+      }
+      const res = await fetch("../../backend/user/view_cart.php");
+      const data = await res.json();
+      const cart = data.cart || [];
+      const container = qs("#cart-container");
+      const checkoutBtn = qs("#checkout-btn");
+      container.innerHTML = '';
+      checkoutBtn.style.display = "none";
+      if (!Array.isArray(cart) || cart.length === 0) {
+        container.innerHTML = '<p>Your cart is empty.</p>';
+        return;
+      }
+      let total = 0;
+      cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        const card = ce("div", "cart-item premium-card");
+        card.innerHTML = `
+          <h3>${item.name}</h3>
+          <p>Price: ${formatPrice(item.price)}</p>
+          <p>Quantity: ${item.quantity}</p>
+          <p>Subtotal: ${formatPrice(subtotal)}</p>
+        `;
+        container.appendChild(card);
+      });
+      const totalDiv = ce("div");
+      totalDiv.style.marginTop = "20px";
+      totalDiv.style.fontWeight = "bold";
+      totalDiv.innerText = `Total Price: ${formatPrice(total)}`;
+      container.appendChild(totalDiv);
+      checkoutBtn.style.display = "inline-block";
+    }
+    qs("#checkout-btn").addEventListener("click", () => {
+      window.location.href = "checkout.html";
+    });
+    fetchCart();
+  </script>
+</body>
+</html>

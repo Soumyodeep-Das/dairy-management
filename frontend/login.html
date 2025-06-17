@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Dairy Fresh</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh Management</div>
+  <h2>Login</h2>
+  <form id="loginForm">
+    <input type="email" id="email" placeholder="Email" required /><br />
+    <input type="password" id="password" placeholder="Password" required /><br />
+    <button type="submit" class="btn">Login</button>
+    <div class="form-feedback" id="loginFeedback"></div>
+  </form>
+  <p>Don't have an account? <a href="register.html">Register here</a>.</p>
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const feedback = document.getElementById("loginFeedback");
+      feedback.textContent = "";
+      try {
+        const res = await fetch('/dairy-management/backend/auth/login.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          localStorage.setItem("user", JSON.stringify({ name: data.name, role: data.role }));
+          window.location.href = data.role === "admin" ? "admin/dashboard.html" : "user/home.html";
+        } else {
+          feedback.textContent = data.message || "Login failed!";
+        }
+      } catch {
+        feedback.textContent = "Server error. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>

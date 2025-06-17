@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dairy Fresh - Products</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh</div>
+  <div class="dashboard-header" style="margin: 0 30px 10px 30px;">
+    <div class="welcome" id="userWelcome"></div>
+    <div class="actions">
+      <a href="cart.html" class="btn">View Cart</a>
+      <a href="checkout.html" class="btn">Checkout</a>
+      <a href="orders.html" class="btn">My Orders</a>
+      <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+  </div>
+  <h1>Welcome to Dairy Fresh</h1>
+  <h2>Available Products</h2>
+  <div id="product-list"></div>
+  <script type="module">
+    import { qs, ce, formatPrice } from "../js/utils.js";
+    import { getUserSession, clearSession } from "../js/auth.js";
+    // Show username
+    const user = getUserSession();
+    if (!user || user.role !== 'user') {
+      window.location.href = "../login.html";
+    } else {
+      qs("#userWelcome").textContent = `Welcome, ${user.name}`;
+    }
+    qs("#logoutBtn").addEventListener("click", () => {
+      clearSession();
+      window.location.href = "../login.html";
+    });
+    async function fetchProducts() {
+      const res = await fetch("../../backend/api/products.php");
+      const data = await res.json();
+      const products = data.products || [];
+      const container = qs("#product-list");
+      container.innerHTML = "";
+      if (products.length > 0) {
+        products.forEach(product => {
+          const card = ce("div", "product-card premium-card");
+          card.innerHTML = `
+            <h3>${product.name}</h3>
+            <p>${product.description || ''}</p>
+            <p>Price: ${formatPrice(product.price)}</p>
+            <p>Stock: ${product.stock}</p>
+            <button data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" class="btn">
+              Add to Cart
+            </button>
+          `;
+          card.querySelector("button").addEventListener("click", async (e) => {
+            const { id, name, price } = e.target.dataset;
+            const quantity = prompt("Enter quantity to add:");
+            if (!quantity || isNaN(quantity) || quantity <= 0) {
+              alert("Invalid quantity.");
+              return;
+            }
+            const user = getUserSession();
+            if (!user) {
+              alert("Please log in first.");
+              window.location.href = "../login.html";
+              return;
+            }
+            const res = await fetch("../../backend/user/add_to_cart.php", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: `product_id=${id}&quantity=${quantity}`
+            });
+            const data = await res.json();
+            if (data.status === "success") {
+              alert("Added to cart!");
+            } else {
+              alert(data.message || "Failed to add to cart.");
+            }
+          });
+          container.appendChild(card);
+        });
+      } else {
+        container.innerHTML = "<p>No products available.</p>";
+      }
+    }
+    fetchProducts();
+  </script>
+</body>
+</html>

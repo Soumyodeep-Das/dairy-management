@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard - Dairy Fresh</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh Admin</div>
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <div class="welcome" id="adminWelcome"></div>
+      <div class="actions">
+        <a href="add-product.html" class="btn">Add New Product</a>
+        <button id="logoutBtn" class="btn">Logout</button>
+      </div>
+    </div>
+    <h1>Admin Dashboard</h1>
+    <table border="0" cellpadding="10" cellspacing="0" style="margin: 20px auto; width: 95%;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Price (₹)</th>
+          <th>Stock</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productsTableBody"></tbody>
+    </table>
+  </div>
+  <script type="module">
+    import { fetchJSON } from "../js/api.js";
+    import { qs } from "../js/utils.js";
+    import { getUserSession, clearSession } from "../js/auth.js";
+    // Show username
+    const user = getUserSession();
+    if (!user || user.role !== 'admin') {
+      window.location.href = "../login.html";
+    } else {
+      qs("#adminWelcome").textContent = `Welcome, ${user.name}`;
+    }
+    qs("#logoutBtn").addEventListener("click", () => {
+      clearSession();
+      window.location.href = "../login.html";
+    });
+    async function fetchProducts() {
+      try {
+        const res = await fetch("../../backend/api/products.php");
+        const data = await res.json();
+        const products = data.products || [];
+        const tbody = qs("#productsTableBody");
+        tbody.innerHTML = "";
+        products.forEach(product => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${product.id}</td>
+            <td>${product.name}</td>
+            <td>${product.category}</td>
+            <td>${parseFloat(product.price).toFixed(2)}</td>
+            <td>${product.stock}</td>
+            <td>
+              <button class="btn" onclick="editProduct(${product.id})">Edit</button>
+              <button class="btn" onclick="deleteProduct(${product.id})">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch {
+        alert("Failed to fetch products. Please login again.");
+        window.location.href = "../login.html";
+      }
+    }
+    window.editProduct = (id) => {
+      window.location.href = `update-product.html?id=${id}`;
+    };
+    window.deleteProduct = async (id) => {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+      try {
+        const res = await fetch(`../../backend/admin/delete_product.php`, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `id=${id}`
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          alert("Product deleted.");
+          fetchProducts();
+        } else {
+          alert("Delete failed: " + (data.message || "Unknown error"));
+        }
+      } catch {
+        alert("Error deleting product.");
+      }
+    };
+    window.onload = fetchProducts;
+  </script>
+</body>
+</html>

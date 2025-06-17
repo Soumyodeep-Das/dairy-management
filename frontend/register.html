@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Register - Dairy Fresh</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh Management</div>
+  <h2>Register</h2>
+  <form id="registerForm">
+    <input type="text" id="name" placeholder="Name" required /><br />
+    <input type="email" id="email" placeholder="Email" required /><br />
+    <input type="password" id="password" placeholder="Password" required /><br />
+    <select id="role" required>
+      <option value="">Select Role</option>
+      <option value="user">User</option>
+      <option value="admin">Admin</option>
+    </select><br />
+    <button type="submit" class="btn">Register</button>
+    <div class="form-feedback" id="registerFeedback"></div>
+  </form>
+  <p>Already have an account? <a href="login.html">Login here</a>.</p>
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const role = document.getElementById("role").value;
+      const feedback = document.getElementById("registerFeedback");
+      feedback.textContent = "";
+      try {
+        const res = await fetch('/dairy-management/backend/auth/register.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&role=${encodeURIComponent(role)}`
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+          feedback.textContent = "Registration successful! Redirecting...";
+          feedback.classList.add("form-success");
+          setTimeout(() => window.location.href = "login.html", 1200);
+        } else {
+          feedback.textContent = data.message || "Registration failed!";
+        }
+      } catch {
+        feedback.textContent = "Server error. Please try again.";
+      }
+    });
+  </script>
+</body>
+</html>

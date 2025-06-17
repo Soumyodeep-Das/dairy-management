@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Checkout - Dairy Fresh</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh</div>
+  <h1>Checkout</h1>
+  <div id="cart-summary"></div>
+
+  <h3>Shipping Information</h3>
+  <form id="checkoutForm">
+    <input type="text" id="shipping_address" placeholder="Shipping Address" required /><br />
+    <input type="text" id="shipping_city" placeholder="City" required /><br />
+    <input type="text" id="shipping_pincode" placeholder="Pincode" required /><br />
+    <input type="text" id="shipping_phone" placeholder="Phone Number" required /><br />
+
+    <h3>Payment Information</h3>
+    <input type="text" id="payment_info" placeholder="Payment Details (e.g. Card info)" required /><br />
+
+    <button type="submit" class="btn">Place Order</button>
+    <div class="form-feedback" id="checkoutFeedback"></div>
+  </form>
+
+  <script type="module">
+    import { qs, formatPrice } from "../js/utils.js";
+    import { getUserSession } from "../js/auth.js";
+
+    let cartItems = [];
+    let totalPrice = 0;
+
+    async function fetchCart() {
+      const user = getUserSession();
+      if (!user) {
+        alert("Please login first.");
+        window.location.href = "../login.html";
+        return;
+      }
+
+      try {
+        const res = await fetch("../../backend/user/view_cart.php");
+        const data = await res.json();
+        cartItems = data.cart || [];
+      } catch (err) {
+        alert("Unable to fetch cart.");
+        return;
+      }
+
+      const container = qs("#cart-summary");
+      const form = qs("#checkoutForm");
+      container.innerHTML = '';
+
+      if (!Array.isArray(cartItems) || cartItems.length === 0) {
+        container.innerHTML = '<p>Your cart is empty. Please add products before checkout.</p>';
+        form.style.display = "none";
+        return;
+      }
+
+      totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+      container.innerHTML = `
+        <p><strong>Number of Items:</strong> ${cartItems.length}</p>
+        <p><strong>Total Price:</strong> ${formatPrice(totalPrice)}</p>
+      `;
+    }
+
+    qs("#checkoutForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const shipping_address = qs("#shipping_address").value.trim();
+      const shipping_city = qs("#shipping_city").value.trim();
+      const shipping_pincode = qs("#shipping_pincode").value.trim();
+      const shipping_phone = qs("#shipping_phone").value.trim();
+      const payment_info = qs("#payment_info").value.trim();
+      const feedback = qs("#checkoutFeedback");
+      feedback.textContent = "";
+
+      if (!shipping_address || !shipping_city || !shipping_pincode || !shipping_phone || !payment_info) {
+        feedback.textContent = "Please fill all fields.";
+        return;
+      }
+
+      const formData = {
+        address: `${shipping_address}, ${shipping_city}, ${shipping_pincode}, ${shipping_phone}`,
+        paymentinfo: payment_info
+      };
+
+      try {
+        const res = await fetch("../../backend/user/place_order.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(formData).toString()
+        });
+        const data = await res.json();
+
+        if (data.status === "success") {
+          feedback.textContent = "Order placed successfully!";
+          feedback.classList.add("form-success");
+          setTimeout(() => window.location.href = "home.html", 1200);
+        } else {
+          feedback.textContent = data.message || "Order failed.";
+        }
+      } catch (err) {
+        feedback.textContent = "Something went wrong placing the order.";
+      }
+    });
+
+    fetchCart();
+  </script>
+</body>
+</html>

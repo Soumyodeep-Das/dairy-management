@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Orders - Dairy Fresh</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh</div>
+  <div class="dashboard-header" style="margin: 0 30px 10px 30px;">
+    <div class="welcome" id="userWelcome"></div>
+    <div class="actions">
+      <a href="home.html" class="btn">Home</a>
+      <a href="cart.html" class="btn">View Cart</a>
+      <a href="checkout.html" class="btn">Checkout</a>
+      <button id="logoutBtn" class="btn">Logout</button>
+    </div>
+  </div>
+  <h1>My Orders</h1>
+  <table style="margin: 0 auto; width: 98%;">
+    <thead>
+      <tr>
+        <th>Order ID</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Total Price</th>
+        <th>Payment</th>
+        <th>Shipping Address</th>
+      </tr>
+    </thead>
+    <tbody id="ordersTableBody"></tbody>
+  </table>
+  <script type="module">
+    import { qs } from "../js/utils.js";
+    import { getUserSession, clearSession } from "../js/auth.js";
+    // Show username
+    const user = getUserSession();
+    if (!user || user.role !== 'user') {
+      window.location.href = "../login.html";
+    } else {
+      qs("#userWelcome").textContent = `Welcome, ${user.name}`;
+    }
+    qs("#logoutBtn").addEventListener("click", () => {
+      clearSession();
+      window.location.href = "../login.html";
+    });
+    async function fetchOrders() {
+      const res = await fetch("../../backend/api/orders.php");
+      const data = await res.json();
+      const orders = data.orders || [];
+      const tbody = qs("#ordersTableBody");
+      tbody.innerHTML = "";
+      if (orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">No orders found.</td></tr>';
+        return;
+      }
+      orders.forEach(order => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${order.id}</td>
+          <td>${order.created_at ? new Date(order.created_at).toLocaleString() : ''}</td>
+          <td>${order.order_status || ''}</td>
+          <td>₹${parseFloat(order.total_price).toFixed(2)}</td>
+          <td>${order.payment_info || ''}</td>
+          <td>${order.address || order.shipping_info_id || ''}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    fetchOrders();
+  </script>
+</body>
+</html>

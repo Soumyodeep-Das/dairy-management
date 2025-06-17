@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Update Product - Dairy Fresh</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+  <div class="header-bar">Dairy Fresh Admin</div>
+  <h1>Update Product</h1>
+  <form id="updateProductForm">
+    <input type="hidden" id="product_id" />
+    <input type="text" id="name" placeholder="Product Name" required /><br />
+    <input type="text" id="category" placeholder="Category" required /><br />
+    <input type="number" step="0.01" id="price" placeholder="Price" required /><br />
+    <input type="number" id="quantity" placeholder="Quantity" required /><br />
+    <input type="text" id="description" placeholder="Description" required /><br />
+    <input type="number" step="0.1" id="ratings" placeholder="Ratings (0-5)" min="0" max="5" required /><br />
+    <input type="date" id="expiry_date" placeholder="Expiry Date" required /><br />
+    <input type="text" id="image" placeholder="Image URL or filename" required /><br />
+    <button type="submit" class="btn">Update Product</button>
+    <div class="form-feedback" id="updateProductFeedback"></div>
+  </form>
+  <a href="dashboard.html">Back to Dashboard</a>
+  <script type="module">
+    import { qs, getParam } from "../js/utils.js";
+    const productId = getParam("id");
+    async function fetchProduct() {
+      if (!productId) {
+        alert("No product ID provided");
+        window.location.href = "dashboard.html";
+        return;
+      }
+      try {
+        const res = await fetch(`../../backend/api/products.php`);
+        const data = await res.json();
+        const products = data.products || [];
+        const product = products.find(p => String(p.id) === String(productId));
+        if (!product) {
+          console.error("Product not found for id:", productId, products);
+          qs("#updateProductFeedback").textContent = "Product not found.";
+          setTimeout(() => window.location.href = "dashboard.html", 1800);
+          return;
+        }
+        qs("#product_id").value = product.id;
+        qs("#name").value = product.name;
+        qs("#category").value = product.category;
+        qs("#price").value = product.price;
+        qs("#quantity").value = product.stock;
+        qs("#description").value = product.description || '';
+        qs("#ratings").value = product.ratings || 0;
+        qs("#expiry_date").value = product.expiry_date ? product.expiry_date.substring(0,10) : '';
+        qs("#image").value = product.image || '';
+      } catch (err) {
+        console.error("Failed to fetch product data", err);
+        alert("Failed to fetch product data");
+        window.location.href = "dashboard.html";
+      }
+    }
+    qs("#updateProductForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const name = qs("#name").value.trim();
+      const category = qs("#category").value.trim();
+      const price = parseFloat(qs("#price").value);
+      const quantity = parseInt(qs("#quantity").value);
+      const description = qs("#description").value.trim();
+      const ratings = parseFloat(qs("#ratings").value);
+      const expiry_date = qs("#expiry_date").value;
+      const image = qs("#image").value.trim();
+      const feedback = qs("#updateProductFeedback");
+      feedback.textContent = "";
+      if (!name || !category || isNaN(price) || isNaN(quantity) || !description || isNaN(ratings) || !expiry_date || !image) {
+        feedback.textContent = "Please fill all fields correctly.";
+        return;
+      }
+      const data = {
+        id: productId,
+        name,
+        category,
+        price,
+        stock: quantity,
+        description,
+        ratings,
+        expiry_date,
+        image
+      };
+      try {
+        const res = await fetch("../../backend/admin/update_product.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams(data).toString()
+        });
+        const result = await res.json();
+        if (result.status === "success") {
+          feedback.textContent = "Product updated successfully.";
+          feedback.classList.add("form-success");
+          setTimeout(() => window.location.href = "dashboard.html", 1200);
+        } else {
+          feedback.textContent = result.message || "Update failed.";
+        }
+      } catch {
+        feedback.textContent = "Server error: Failed to update product.";
+      }
+    });
+    window.onload = fetchProduct;
+  </script>
+</body>
+</html>
