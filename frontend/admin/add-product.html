@@ -6,20 +6,25 @@
 </head>
 <body>
   <div class="header-bar">Dairy Fresh Admin</div>
-  <h1>Add New Product</h1>
-
-  <form id="addProductForm">
-    <input type="text" id="name" placeholder="Product Name" required /><br />
-    <input type="text" id="category" placeholder="Category" required /><br />
-    <input type="number" step="0.01" id="price" placeholder="Price" required /><br />
-    <input type="number" id="quantity" placeholder="Quantity" required /><br />
-    <button type="submit" class="btn">Add Product</button>
-    <div class="form-feedback" id="addProductFeedback"></div>
-  </form>
-
-  <a href="dashboard.html">Back to Dashboard</a>
+  <div style="display: flex; align-items: center; justify-content: center; min-height: 70vh; width: 100vw;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; max-width: 480px;">
+      <h1 style="margin-bottom: 10px; text-align: center;">Add New Product</h1>
+      <form id="addProductForm" style="width: 100%; max-width: 400px;">
+        <input type="text" id="name" placeholder="Product Name" required />
+        <input type="text" id="category" placeholder="Category" required />
+        <input type="number" step="0.01" id="price" placeholder="Price" required />
+        <input type="number" id="quantity" placeholder="Quantity" required />
+        <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Add Product</button>
+        <div class="form-feedback" id="addProductFeedback"></div>
+      </form>
+      <a href="dashboard.html" style="margin-top: 18px; text-align: center;">Back to Dashboard</a>
+    </div>
+  </div>
 
   <script type="module">
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) window.location.reload();
+    });
     import { postData } from "../js/api.js";
     import { qs } from "../js/utils.js";
     import { getUserSession } from "../js/auth.js";

@@ -6,22 +6,27 @@
 </head>
 <body>
   <div class="header-bar">Dairy Fresh Admin</div>
-  <h1>Update Product</h1>
-  <form id="updateProductForm">
-    <input type="hidden" id="product_id" />
-    <input type="text" id="name" placeholder="Product Name" required /><br />
-    <input type="text" id="category" placeholder="Category" required /><br />
-    <input type="number" step="0.01" id="price" placeholder="Price" required /><br />
-    <input type="number" id="quantity" placeholder="Quantity" required /><br />
-    <input type="text" id="description" placeholder="Description" required /><br />
-    <input type="number" step="0.1" id="ratings" placeholder="Ratings (0-5)" min="0" max="5" required /><br />
-    <input type="date" id="expiry_date" placeholder="Expiry Date" required /><br />
-    <input type="text" id="image" placeholder="Image URL or filename" required /><br />
-    <button type="submit" class="btn">Update Product</button>
-    <div class="form-feedback" id="updateProductFeedback"></div>
-  </form>
-  <a href="dashboard.html">Back to Dashboard</a>
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+    <h1 style="margin-bottom: 10px;">Update Product</h1>
+    <form id="updateProductForm" style="width: 100%; max-width: 400px;">
+      <input type="hidden" id="product_id" />
+      <input type="text" id="name" placeholder="Product Name" required />
+      <input type="text" id="category" placeholder="Category" required />
+      <input type="number" step="0.01" id="price" placeholder="Price" required />
+      <input type="number" id="quantity" placeholder="Quantity" required />
+      <input type="text" id="description" placeholder="Description" required />
+      <input type="number" step="0.1" id="ratings" placeholder="Ratings (0-5)" min="0" max="5" required />
+      <input type="date" id="expiry_date" placeholder="Expiry Date" required />
+      <input type="text" id="image" placeholder="Image URL or filename" required />
+      <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Update Product</button>
+      <div class="form-feedback" id="updateProductFeedback"></div>
+    </form>
+    <a href="dashboard.html" style="margin-top: 18px;">Back to Dashboard</a>
+  </div>
   <script type="module">
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) window.location.reload();
+    });
     import { qs, getParam } from "../js/utils.js";
     const productId = getParam("id");
     async function fetchProduct() {

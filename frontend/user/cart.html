@@ -6,10 +6,15 @@
 </head>
 <body>
   <div class="header-bar">Dairy Fresh</div>
-  <h1>Your Cart</h1>
-  <div id="cart-container"></div>
-  <button id="checkout-btn" class="btn" style="display: none;">Proceed to Checkout</button>
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; width: 100vw;">
+    <h1 style="text-align: center; margin-bottom: 10px;">Your Cart</h1>
+    <div id="cart-container" style="width: 100%; max-width: 400px;"></div>
+    <button id="checkout-btn" class="btn" style="display: none; width: 100%; margin-top: 18px;">Proceed to Checkout</button>
+  </div>
   <script type="module">
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) window.location.reload();
+    });
     import { qs, ce, formatPrice } from "../js/utils.js";
     import { getUserSession } from "../js/auth.js";
     async function fetchCart() {

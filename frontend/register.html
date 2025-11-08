@@ -6,20 +6,22 @@
 </head>
 <body>
   <div class="header-bar">Dairy Fresh Management</div>
-  <h2>Register</h2>
-  <form id="registerForm">
-    <input type="text" id="name" placeholder="Name" required /><br />
-    <input type="email" id="email" placeholder="Email" required /><br />
-    <input type="password" id="password" placeholder="Password" required /><br />
-    <select id="role" required>
-      <option value="">Select Role</option>
-      <option value="user">User</option>
-      <option value="admin">Admin</option>
-    </select><br />
-    <button type="submit" class="btn">Register</button>
-    <div class="form-feedback" id="registerFeedback"></div>
-  </form>
-  <p>Already have an account? <a href="login.html">Login here</a>.</p>
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+    <h2 style="margin-bottom: 10px;">Register</h2>
+    <form id="registerForm" style="width: 100%; max-width: 400px;">
+      <input type="text" id="name" placeholder="Name" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <select id="role" required style="margin-bottom: 18px;">
+        <option value="">Select Role</option>
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Register</button>
+      <div class="form-feedback" id="registerFeedback"></div>
+    </form>
+    <p style="margin-top: 18px;">Already have an account? <a href="login.html">Login here</a>.</p>
+  </div>
   <script>
     document.getElementById("registerForm").addEventListener("submit", async function(e) {
       e.preventDefault();

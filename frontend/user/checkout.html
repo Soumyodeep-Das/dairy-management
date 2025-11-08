@@ -6,24 +6,26 @@
 </head>
 <body>
   <div class="header-bar">Dairy Fresh</div>
-  <h1>Checkout</h1>
-  <div id="cart-summary"></div>
-
-  <h3>Shipping Information</h3>
-  <form id="checkoutForm">
-    <input type="text" id="shipping_address" placeholder="Shipping Address" required /><br />
-    <input type="text" id="shipping_city" placeholder="City" required /><br />
-    <input type="text" id="shipping_pincode" placeholder="Pincode" required /><br />
-    <input type="text" id="shipping_phone" placeholder="Phone Number" required /><br />
-
-    <h3>Payment Information</h3>
-    <input type="text" id="payment_info" placeholder="Payment Details (e.g. Card info)" required /><br />
-
-    <button type="submit" class="btn">Place Order</button>
-    <div class="form-feedback" id="checkoutFeedback"></div>
-  </form>
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; width: 100vw;">
+    <h1 style="text-align: center; margin-bottom: 10px;">Checkout</h1>
+    <div id="cart-summary" style="width: 100%; max-width: 400px;"></div>
+    <h3 style="text-align: center; margin-top: 18px;">Shipping Information</h3>
+    <form id="checkoutForm" style="width: 100%; max-width: 400px;">
+      <input type="text" id="shipping_address" placeholder="Shipping Address" required />
+      <input type="text" id="shipping_city" placeholder="City" required />
+      <input type="text" id="shipping_pincode" placeholder="Pincode" required />
+      <input type="text" id="shipping_phone" placeholder="Phone Number" required />
+      <h3 style="text-align: center; margin-top: 18px;">Payment Information</h3>
+      <input type="text" id="payment_info" placeholder="Payment Details (e.g. Card info)" required />
+      <button type="submit" class="btn" style="width: 100%; margin-top: 10px;">Place Order</button>
+      <div class="form-feedback" id="checkoutFeedback"></div>
+    </form>
+  </div>
 
   <script type="module">
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) window.location.reload();
+    });
     import { qs, formatPrice } from "../js/utils.js";
     import { getUserSession } from "../js/auth.js";
 

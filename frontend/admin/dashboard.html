@@ -21,7 +21,7 @@
           <th>ID</th>
           <th>Name</th>
           <th>Category</th>
-          <th>Price (₹)</th>
+          <th>Price (in Rupees)</th>
           <th>Stock</th>
           <th>Actions</th>
         </tr>
@@ -30,6 +30,9 @@
     </table>
   </div>
   <script type="module">
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) window.location.reload();
+    });
     import { fetchJSON } from "../js/api.js";
     import { qs } from "../js/utils.js";
     import { getUserSession, clearSession } from "../js/auth.js";

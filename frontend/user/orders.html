@@ -15,21 +15,26 @@
       <button id="logoutBtn" class="btn">Logout</button>
     </div>
   </div>
-  <h1>My Orders</h1>
-  <table style="margin: 0 auto; width: 98%;">
-    <thead>
-      <tr>
-        <th>Order ID</th>
-        <th>Date</th>
-        <th>Status</th>
-        <th>Total Price</th>
-        <th>Payment</th>
-        <th>Shipping Address</th>
-      </tr>
-    </thead>
-    <tbody id="ordersTableBody"></tbody>
-  </table>
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; width: 100vw;">
+    <h1 style="text-align: center; margin-bottom: 10px;">My Orders</h1>
+    <table style="margin: 0 auto; width: 98%; max-width: 900px;">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Total Price</th>
+          <th>Payment</th>
+          <th>Shipping Address</th>
+        </tr>
+      </thead>
+      <tbody id="ordersTableBody"></tbody>
+    </table>
+  </div>
   <script type="module">
+    window.addEventListener("pageshow", function(event) {
+      if (event.persisted) window.location.reload();
+    });
     import { qs } from "../js/utils.js";
     import { getUserSession, clearSession } from "../js/auth.js";
     // Show username
